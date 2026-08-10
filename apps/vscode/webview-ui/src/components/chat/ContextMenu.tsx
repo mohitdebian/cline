@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { cleanPathPrefix } from "@/components/common/CodeAccordian"
 import ScreenReaderAnnounce from "@/components/common/ScreenReaderAnnounce"
 import { useMenuAnnouncement } from "@/hooks/useMenuAnnouncement"
@@ -363,4 +363,6 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
 	)
 }
 
-export default ContextMenu
+// Wrap with React.memo to prevent unnecessary re-renders when ChatTextArea state changes (e.g. while typing)
+// but ContextMenu props remain identical, reducing UI jank during active text entry.
+export default memo(ContextMenu)
