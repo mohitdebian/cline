@@ -1,0 +1,4 @@
+## 2025-02-09 - [Prevent XSS in Fuse.js highlights]
+**Vulnerability:** Found multiple `dangerouslySetInnerHTML` usages in ModelPicker components. These consume `.html` properties constructed by `highlight()` function in `HistoryView.tsx` from Fuse.js search results without escaping HTML entities. A malicious model name/description could execute arbitrary JS if it contains tags like `<script>`.
+**Learning:** `dangerouslySetInnerHTML` allows for UI highlights constructed from strings, but all dynamic user input must be sanitized. `Fuse.js` does not escape the inputs automatically.
+**Prevention:** Make sure functions that generate highlight strings for `dangerouslySetInnerHTML` (like `generateHighlightedText`) explicitly escape HTML components using `.replace()` rules for `&`, `<`, `>`, `"`, and `'` before appending wrapper `<span>` tags.
