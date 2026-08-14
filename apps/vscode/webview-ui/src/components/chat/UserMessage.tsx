@@ -1,6 +1,5 @@
 import { EditMessageAndRegenerateRequest } from "@shared/proto/cline/task"
-import type React from "react"
-import { useMemo, useState } from "react"
+import React, { memo, useMemo, useState } from "react"
 import Thumbnails from "@/components/common/Thumbnails"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { TaskServiceClient } from "@/services/grpc-client"
@@ -15,7 +14,7 @@ interface UserMessageProps {
 	canRestoreWorkspace?: boolean
 }
 
-const UserMessage: React.FC<UserMessageProps> = ({ text, images, files, messageTs, canRestoreWorkspace = true }) => {
+const UserMessage: React.FC<UserMessageProps> = memo(({ text, images, files, messageTs, canRestoreWorkspace = true }) => {
 	const [isEditing, setIsEditing] = useState(false)
 	const [editedText, setEditedText] = useState(text ?? "")
 	const [editedImages, setEditedImages] = useState(images ?? [])
@@ -185,6 +184,8 @@ const UserMessage: React.FC<UserMessageProps> = ({ text, images, files, messageT
 			)}
 		</div>
 	)
-}
+})
+
+UserMessage.displayName = "UserMessage"
 
 export default UserMessage

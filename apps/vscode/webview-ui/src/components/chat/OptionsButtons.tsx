@@ -1,5 +1,5 @@
 import { AskResponseRequest } from "@shared/proto/cline/task"
-import { useState } from "react"
+import { memo, useState } from "react"
 import styled from "styled-components"
 import { CODE_BLOCK_BG_COLOR } from "@/components/common/CodeBlock"
 import { TaskServiceClient } from "@/services/grpc-client"
@@ -24,7 +24,7 @@ const OptionButton = styled.button<{ $isSelected?: boolean; $isNotSelectable?: b
 	`}
 `
 
-export const OptionsButtons = ({
+export const OptionsButtons = memo(({
 	options,
 	selected,
 	isActive,
@@ -93,4 +93,6 @@ export const OptionsButtons = ({
 			))}
 		</div>
 	)
-}
+})
+
+OptionsButtons.displayName = "OptionsButtons"
