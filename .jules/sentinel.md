@@ -1,0 +1,4 @@
+## 2025-02-14 - Fix Unescaped HTML in History Highlights
+**Vulnerability:** The search highlight mechanism in `HistoryView.tsx` sliced user-controlled or API-controlled text using match indices and wrapped them in unescaped `<span>` tags. The output was directly inserted using `dangerouslySetInnerHTML` in multiple Model Pickers, creating an XSS vector.
+**Learning:** Highlighting functions that combine raw strings and HTML strings for insertion into `dangerouslySetInnerHTML` are dangerous if the text slices aren't escaped *after* slicing but *before* combining.
+**Prevention:** Always use a safe HTML escape mechanism on slices of untrusted text when generating HTML strings manually. Avoid using `dangerouslySetInnerHTML` where standard React escaping can be used (e.g. mapping over parts instead of generating a string).
