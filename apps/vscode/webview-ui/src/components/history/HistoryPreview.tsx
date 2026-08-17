@@ -1,5 +1,5 @@
 import { StringRequest } from "@shared/proto/cline/common"
-import { memo } from "react"
+import { memo, useMemo } from "react"
 import { useExtensionState } from "@/context/ExtensionStateContext"
 import { TaskServiceClient } from "@/services/grpc-client"
 
@@ -14,6 +14,11 @@ const HistoryPreview = ({ showHistoryView }: HistoryPreviewProps) => {
 			console.error("Error showing task:", error),
 		)
 	}
+
+	// ⚡ Bolt: Memoize filtered history to avoid O(N) filtering three times on every render
+	const validTaskHistory = useMemo(() => {
+		return taskHistory.filter((item) => item.ts && item.task)
+	}, [taskHistory])
 
 	const formatDate = (timestamp: number) => {
 		const date = new Date(timestamp)
@@ -129,7 +134,7 @@ const HistoryPreview = ({ showHistoryView }: HistoryPreviewProps) => {
 						Recent
 					</span>
 				</div>
-				{taskHistory.filter((item) => item.ts && item.task).length > 0 && (
+				{validTaskHistory.length > 0 && (
 					<button
 						aria-label="View all history"
 						className="history-view-all-btn"
@@ -143,9 +148,8 @@ const HistoryPreview = ({ showHistoryView }: HistoryPreviewProps) => {
 
 			{
 				<div className="px-4">
-					{taskHistory.filter((item) => item.ts && item.task).length > 0 ? (
-						taskHistory
-							.filter((item) => item.ts && item.task)
+					{validTaskHistory.length > 0 ? (
+						validTaskHistory
 							.slice(0, 3)
 							.map((item) => (
 								<div className="history-preview-item" key={item.id} onClick={() => handleHistorySelect(item.id)}>
