@@ -364,7 +364,8 @@ const HistoryView = ({ onDone }: HistoryViewProps) => {
 			return 0
 		}
 
-		return tasks.filter((item) => selectedItems.includes(item.id)).reduce((total, item) => total + (item.size || 0), 0)
+		const selectedSet = new Set(selectedItems)
+		return tasks.reduce((total, item) => (selectedSet.has(item.id) ? total + (item.size || 0) : total), 0)
 	}, [selectedItems, tasks])
 
 	const handleBatchHistorySelect = useCallback(
