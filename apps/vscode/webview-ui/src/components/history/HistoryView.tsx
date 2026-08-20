@@ -553,6 +553,15 @@ const HistoryView = ({ onDone }: HistoryViewProps) => {
 
 // https://gist.github.com/evenfrost/1ba123656ded32fb7a0cd4651efd4db0
 export const highlight = (fuseSearchResult: FuseResult<any>[], highlightClassName = "history-item-highlight") => {
+	const escapeHtml = (unsafe: string) => {
+		return unsafe
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#039;")
+	}
+
 	const set = (obj: Record<string, any>, path: string, value: any) => {
 		const pathValue = path.split(".")
 		let i: number
@@ -607,16 +616,16 @@ export const highlight = (fuseSearchResult: FuseResult<any>[], highlightClassNam
 			const lastRegionNextIndex = end + 1
 
 			content += [
-				inputText.substring(nextUnhighlightedRegionStartingIndex, start),
+				escapeHtml(inputText.substring(nextUnhighlightedRegionStartingIndex, start)),
 				`<span class="${highlightClassName}">`,
-				inputText.substring(start, lastRegionNextIndex),
+				escapeHtml(inputText.substring(start, lastRegionNextIndex)),
 				"</span>",
 			].join("")
 
 			nextUnhighlightedRegionStartingIndex = lastRegionNextIndex
 		})
 
-		content += inputText.substring(nextUnhighlightedRegionStartingIndex)
+		content += escapeHtml(inputText.substring(nextUnhighlightedRegionStartingIndex))
 
 		return content
 	}
