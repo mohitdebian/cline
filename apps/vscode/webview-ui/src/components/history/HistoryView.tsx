@@ -1,6 +1,7 @@
 import { EmptyRequest, StringArrayRequest } from "@shared/proto/cline/common"
 import { GetTaskHistoryRequest, TaskFavoriteRequest, type TaskItem } from "@shared/proto/cline/task"
 import { VSCodeTextField } from "@vscode/webview-ui-toolkit/react"
+import DOMPurify from "dompurify"
 import Fuse, { FuseResult } from "fuse.js"
 import { FunnelIcon } from "lucide-react"
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react"
@@ -618,7 +619,7 @@ export const highlight = (fuseSearchResult: FuseResult<any>[], highlightClassNam
 
 		content += inputText.substring(nextUnhighlightedRegionStartingIndex)
 
-		return content
+		return DOMPurify.sanitize(content)
 	}
 
 	return fuseSearchResult
