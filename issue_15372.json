@@ -1,0 +1,103 @@
+{
+  "url": "https://api.github.com/repos/cline/cline/issues/15372",
+  "repository_url": "https://api.github.com/repos/cline/cline",
+  "labels_url": "https://api.github.com/repos/cline/cline/issues/15372/labels{/name}",
+  "comments_url": "https://api.github.com/repos/cline/cline/issues/15372/comments",
+  "events_url": "https://api.github.com/repos/cline/cline/issues/15372/events",
+  "html_url": "https://github.com/cline/cline/issues/15372",
+  "id": 6048175954,
+  "node_id": "I_kwDOMSqWwc8AAAABaH_XUg",
+  "number": 15372,
+  "title": "Cline Desktop: Open Settings shortcut does not work in Cline Desktop.",
+  "user": {
+    "login": "kirtirajsinh-dot",
+    "id": 224157018,
+    "node_id": "U_kgDODVxdWg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/224157018?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/kirtirajsinh-dot",
+    "html_url": "https://github.com/kirtirajsinh-dot",
+    "followers_url": "https://api.github.com/users/kirtirajsinh-dot/followers",
+    "following_url": "https://api.github.com/users/kirtirajsinh-dot/following{/other_user}",
+    "gists_url": "https://api.github.com/users/kirtirajsinh-dot/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/kirtirajsinh-dot/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/kirtirajsinh-dot/subscriptions",
+    "organizations_url": "https://api.github.com/users/kirtirajsinh-dot/orgs",
+    "repos_url": "https://api.github.com/users/kirtirajsinh-dot/repos",
+    "events_url": "https://api.github.com/users/kirtirajsinh-dot/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/kirtirajsinh-dot/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 9215027719,
+      "node_id": "LA_kwDOMSqWwc8AAAACJUIqBw",
+      "url": "https://api.github.com/repos/cline/cline/labels/QA",
+      "name": "QA",
+      "color": "b029e4",
+      "default": false,
+      "description": "Created by internal QA team",
+      "archived_at": null,
+      "archived_by": null
+    },
+    {
+      "id": 12220332338,
+      "node_id": "LA_kwDOMSqWwc8AAAAC2GN5Mg",
+      "url": "https://api.github.com/repos/cline/cline/labels/Desktop%20App",
+      "name": "Desktop App",
+      "color": "345f76",
+      "default": false,
+      "description": "Use it for reports related to the Cline Code desktop app.",
+      "archived_at": null,
+      "archived_by": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2026-10-26T21:07:11Z",
+  "updated_at": "2026-10-26T21:07:15Z",
+  "closed_at": null,
+  "assignee": null,
+  "author_association": "COLLABORATOR",
+  "issue_field_values": [
+
+  ],
+  "type": null,
+  "active_lock_reason": null,
+  "sub_issues_summary": {
+    "total": 0,
+    "completed": 0,
+    "percent_completed": 0
+  },
+  "issue_dependencies_summary": {
+    "blocked_by": 0,
+    "total_blocked_by": 0,
+    "blocking": 0,
+    "total_blocking": 0
+  },
+  "body": "### Cline Surface\n\nDesktop App\n\n### Cline Version\n\n0.0.49\n\n### Beta version\n\n- [ ] I am using a beta version of Cline\n\n### What happened?\n\nThe ⌘ + , keyboard shortcut is not opening the Settings page in Cline Desktop, even though it is displayed as the assigned shortcut.\n\n### Steps to reproduce\n\n1. Open Cline Desktop.\n2. Navigate to Settings → Keybindings.\n3. Verify that the shortcut for Open settings is ⌘ + ,.\n4. Press ⌘ + ,.\n\n### Observed:\nSettings does not open when the keyboard shortcut is pressed.\n\n### Expected:\nSettings should open when the user presses ⌘ + ,\n\n### Video Link: https://drive.google.com/file/d/1CbO-ZC-YH5AMn_Jq_3MglzgOuNtGFMaU/view?usp=sharing\n\n\n### Provider/Model\n\nanthropic/claude-sonnet-5.5\n\n### Diagnostics\n\n_No response_\n\n### System Information\n\n0.0.49",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/cline/cline/issues/15372/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/cline/cline/issues/15372/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null,
+  "pinned_comment": null
+}

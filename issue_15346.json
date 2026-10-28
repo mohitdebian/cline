@@ -1,0 +1,92 @@
+{
+  "url": "https://api.github.com/repos/cline/cline/issues/15346",
+  "repository_url": "https://api.github.com/repos/cline/cline",
+  "labels_url": "https://api.github.com/repos/cline/cline/issues/15346/labels{/name}",
+  "comments_url": "https://api.github.com/repos/cline/cline/issues/15346/comments",
+  "events_url": "https://api.github.com/repos/cline/cline/issues/15346/events",
+  "html_url": "https://github.com/cline/cline/issues/15346",
+  "id": 6034228737,
+  "node_id": "I_kwDOMSqWwc8AAAABZ6sGAQ",
+  "number": 15346,
+  "title": "MCP tool discovery ignores tools/list pages after nextCursor",
+  "user": {
+    "login": "yxccai",
+    "id": 189196712,
+    "node_id": "U_kgDOC0bpqA",
+    "avatar_url": "https://avatars.githubusercontent.com/u/189196712?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/yxccai",
+    "html_url": "https://github.com/yxccai",
+    "followers_url": "https://api.github.com/users/yxccai/followers",
+    "following_url": "https://api.github.com/users/yxccai/following{/other_user}",
+    "gists_url": "https://api.github.com/users/yxccai/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/yxccai/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/yxccai/subscriptions",
+    "organizations_url": "https://api.github.com/users/yxccai/orgs",
+    "repos_url": "https://api.github.com/users/yxccai/repos",
+    "events_url": "https://api.github.com/users/yxccai/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/yxccai/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 9414822871,
+      "node_id": "LA_kwDOMSqWwc8AAAACMSrL1w",
+      "url": "https://api.github.com/repos/cline/cline/labels/CLI",
+      "name": "CLI",
+      "color": "d93f0b",
+      "default": false,
+      "description": "Issues related to the Cline CLI",
+      "archived_at": null,
+      "archived_by": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2026-10-26T05:58:50Z",
+  "updated_at": "2026-10-26T05:58:58Z",
+  "closed_at": null,
+  "assignee": null,
+  "author_association": "NONE",
+  "issue_field_values": [
+
+  ],
+  "type": null,
+  "active_lock_reason": null,
+  "sub_issues_summary": {
+    "total": 0,
+    "completed": 0,
+    "percent_completed": 0
+  },
+  "issue_dependencies_summary": {
+    "blocked_by": 0,
+    "total_blocked_by": 0,
+    "blocking": 0,
+    "total_blocking": 0
+  },
+  "body": "### Cline Surface\n\nCLI / shared Core MCP client.\n\n### Cline Version\n\nSource checkout at `a459f1d04dea030833b558be645011ab739c463b`, `@cline/core` 0.2.0.\n\n### What happened?\n\nBoth `StdioMcpClient.listTools()` and `SdkUrlMcpClient.listTools()` issue a single `tools/list` request and return that page. When the server includes `nextCursor`, its remaining tools are missing from the catalog exposed to the agent.\n\nExpected: follow the server's opaque cursors within the same connection and return all tools. This is the [MCP pagination flow](https://modelcontextprotocol.io/specification/2025-11-25/server/utilities/pagination).\n\n### Steps to reproduce\n\n1. Run an MCP server whose first `tools/list` response is:\n\n```json\n{\n  \"tools\": [{ \"name\": \"search_tickets\", \"inputSchema\": { \"type\": \"object\" } }],\n  \"nextCursor\": \"opaque:/page+2?token=a%3Db\"\n}\n```\n\n2. When requested with `params.cursor` equal to that token, return:\n\n```json\n{\n  \"tools\": [{ \"name\": \"get_ticket\", \"inputSchema\": { \"type\": \"object\" } }]\n}\n```\n\n3. Connect through `createDefaultMcpServerClientFactory()`, using either a stdio registration or a Streamable HTTP registration, and call `client.listTools()`.\n\nActual: only `search_tickets` is returned; the server never receives the cursor request. Expected: `search_tickets` and `get_ticket`.\n\nThe regression fixture exercises real stdio processes and a local HTTP server using the actual MCP SDK. On unchanged source, 8 pagination assertions fail while 2 single-page controls pass. Following the cursor makes all 10 cases pass, including a three-page response with an empty middle page, metadata preservation, later-page errors and rediscovery from the first page.\n\n### Provider/Model\n\nMCP tool discovery, before the model request.\n\n### System Information\n\nWindows, Node.js 24.13.0, Bun 1.4.2.\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/cline/cline/issues/15346/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/cline/cline/issues/15346/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null,
+  "pinned_comment": null
+}

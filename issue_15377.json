@@ -1,0 +1,82 @@
+{
+  "url": "https://api.github.com/repos/cline/cline/issues/15377",
+  "repository_url": "https://api.github.com/repos/cline/cline",
+  "labels_url": "https://api.github.com/repos/cline/cline/issues/15377/labels{/name}",
+  "comments_url": "https://api.github.com/repos/cline/cline/issues/15377/comments",
+  "events_url": "https://api.github.com/repos/cline/cline/issues/15377/events",
+  "html_url": "https://github.com/cline/cline/issues/15377",
+  "id": 6055742216,
+  "node_id": "I_kwDOMSqWwc8AAAABaPNLCA",
+  "number": 15377,
+  "title": "Commit search drops the quotes from the query, so quoted searches return the wrong commits",
+  "user": {
+    "login": "Eapp1e",
+    "id": 163811520,
+    "node_id": "U_kgDOCcOQwA",
+    "avatar_url": "https://avatars.githubusercontent.com/u/163811520?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Eapp1e",
+    "html_url": "https://github.com/Eapp1e",
+    "followers_url": "https://api.github.com/users/Eapp1e/followers",
+    "following_url": "https://api.github.com/users/Eapp1e/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Eapp1e/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Eapp1e/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Eapp1e/subscriptions",
+    "organizations_url": "https://api.github.com/users/Eapp1e/orgs",
+    "repos_url": "https://api.github.com/users/Eapp1e/repos",
+    "events_url": "https://api.github.com/users/Eapp1e/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Eapp1e/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2026-10-27T08:39:09Z",
+  "updated_at": "2026-10-27T08:39:13Z",
+  "closed_at": null,
+  "assignee": null,
+  "author_association": "NONE",
+  "issue_field_values": [
+
+  ],
+  "type": null,
+  "active_lock_reason": null,
+  "sub_issues_summary": {
+    "total": 0,
+    "completed": 0,
+    "percent_completed": 0
+  },
+  "issue_dependencies_summary": {
+    "blocked_by": 0,
+    "total_blocked_by": 0,
+    "blocking": 0,
+    "total_blocking": 0
+  },
+  "body": "### What happened\n\nSearching commits from the chat input (the `@` commit picker) with a quoted term returns commits that do not contain it, and misses the one that does.\n\nThe query is interpolated into a shell command in `apps/vscode/src/utils/git.ts`:\n\n```ts\nconst { stdout } = await execAsync(\n\t`git log -n 10 --format=\"...\" --date=short ` + `--grep=\"${query}\" --regexp-ignore-case`,\n\t{ cwd },\n)\n```\n\nThe shell consumes the quotes and hands `git` the bare word, so `\"quoted\"` is searched as `quoted`. The same pattern repeats for the hash fallback (`--author-date-order ${query}`) and for `getCommitInfo()` (`git show ... ${hash}`), which also receives a hash copied from a mention.\n\n### Steps to reproduce\n\n1. In a repo with two commits: `feat: handle quoted arguments` and then `feat: handle \"quoted\" arguments`.\n2. Type `\"quoted\"` into the commit search.\n\nExpected: one result, the commit whose subject contains the quotes.\nActual: both commits come back, because the pattern lost its quotes.\n\nA query made of shell syntax is also handed to the shell instead of being searched for.\n\n### The fix\n\nThe same file already passes file names to git as separate `argv` entries for exactly this reason:\n\n```ts\n// Pass the filename as a separate argv entry (no shell) so names containing\n// quotes, `$`, backticks, or spaces can't be interpreted as shell syntax.\nconst { stdout } = await execFileAsync(\"git\", [\"--no-pager\", \"diff\", \"--no-index\", ... , file], { cwd })\n```\n\nI ported the four `execAsync(...)` call sites in `searchCommits()` and `getCommitInfo()` to `execFileAsync(\"git\", [...])` so the query and the revision are single arguments.\n\n### Environment\n\n- Cline version: current `main` (`775d0398`)\n- OS: Windows 11 (also reproducible on macOS/Linux)\n- With `git` 2.51\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/cline/cline/issues/15377/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/cline/cline/issues/15377/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null,
+  "pinned_comment": null
+}

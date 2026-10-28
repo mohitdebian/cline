@@ -1,0 +1,92 @@
+{
+  "url": "https://api.github.com/repos/cline/cline/issues/15323",
+  "repository_url": "https://api.github.com/repos/cline/cline",
+  "labels_url": "https://api.github.com/repos/cline/cline/issues/15323/labels{/name}",
+  "comments_url": "https://api.github.com/repos/cline/cline/issues/15323/comments",
+  "events_url": "https://api.github.com/repos/cline/cline/issues/15323/events",
+  "html_url": "https://github.com/cline/cline/issues/15323",
+  "id": 6012047423,
+  "node_id": "I_kwDOMSqWwc8AAAABZliQPw",
+  "number": 15323,
+  "title": "Stream retry keeps the failed attempt's text: the saved assistant message mixes text the model never sent with the retry's tool call",
+  "user": {
+    "login": "Jingyi-A-Chen",
+    "id": 176925044,
+    "node_id": "U_kgDOCoupdA",
+    "avatar_url": "https://avatars.githubusercontent.com/u/176925044?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Jingyi-A-Chen",
+    "html_url": "https://github.com/Jingyi-A-Chen",
+    "followers_url": "https://api.github.com/users/Jingyi-A-Chen/followers",
+    "following_url": "https://api.github.com/users/Jingyi-A-Chen/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Jingyi-A-Chen/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Jingyi-A-Chen/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Jingyi-A-Chen/subscriptions",
+    "organizations_url": "https://api.github.com/users/Jingyi-A-Chen/orgs",
+    "repos_url": "https://api.github.com/users/Jingyi-A-Chen/repos",
+    "events_url": "https://api.github.com/users/Jingyi-A-Chen/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Jingyi-A-Chen/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 9414822871,
+      "node_id": "LA_kwDOMSqWwc8AAAACMSrL1w",
+      "url": "https://api.github.com/repos/cline/cline/labels/CLI",
+      "name": "CLI",
+      "color": "d93f0b",
+      "default": false,
+      "description": "Issues related to the Cline CLI",
+      "archived_at": null,
+      "archived_by": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2026-10-24T10:38:16Z",
+  "updated_at": "2026-10-24T10:38:24Z",
+  "closed_at": null,
+  "assignee": null,
+  "author_association": "NONE",
+  "issue_field_values": [
+
+  ],
+  "type": null,
+  "active_lock_reason": null,
+  "sub_issues_summary": {
+    "total": 0,
+    "completed": 0,
+    "percent_completed": 0
+  },
+  "issue_dependencies_summary": {
+    "blocked_by": 0,
+    "total_blocked_by": 0,
+    "blocking": 0,
+    "total_blocking": 0
+  },
+  "body": "### Cline Surface\n\nCLI\n\n### Cline Version\n\n3.0.73\n\n### Beta version\n\n- [ ] I am using a beta version of Cline\n\n### What happened?\n\nA streamed response sends some text and then fails inside the stream, for example with an Anthropic `event: error` / `overloaded_error`. The automatic stream retry (`streamRetries: 3`, added in #15100) re-issues the request, and the retry returns a tool call.\n\nThe failed attempt's text is never discarded. Cline saves one assistant message with the failed attempt's text **and** the retry's tool call, and it sends that message in every later request. The model never produced that message. If the retry also streams text, the history contains the text twice. #15100 notes that emitted text \"may repeat\" in the UI; the problem here is that it also goes into the saved transcript and into the next request to the model.\n\nCause: across a stream retry, AI SDK 7 buffers only tool parts. The failed attempt's text and reasoning deltas have already reached `fullStream`, and the retry boundary is not forwarded. `AgentRuntime.streamPreparedRequest` (`sdk/packages/agents/src/agent-runtime.ts`) appends every `text-delta` to the message it records. This contradicts the rule in `isRetryableProviderErrorTurn` and `retry-empty-response.ts`: an attempt that already emitted output must not be retried, because its text cannot be retracted. The stream retry also doesn't check the error type, so non-retryable errors such as `not_found_error` are retried too.\n\nExpected: the saved message and the next request contain only the successful attempt. The open PR #14996 does this by rolling back the failed attempt's provisional content. Alternatively, don't retry a stream that has already emitted output.\n\n### Steps to reproduce\n\nThe code is in the shared SDK, so the steps use the SDK packages that CLI 3.0.73 ships (0.0.95). The model's three responses are hard-coded SSE bodies passed through the provider's `fetch`. No network or API key is needed.\n\n1. `npm i @cline/agents@0.0.95 @cline/llms@0.0.95 @cline/shared@0.0.95` in an empty directory with `{ \"type\": \"module\" }` in `package.json`.\n2. Save the script below as `repro.mjs`.\n3. Run `node repro.mjs`.\n\n```js\n// npm i @cline/agents@0.0.95 @cline/llms@0.0.95 @cline/shared@0.0.95\nimport { Agent } from '@cline/agents';\nimport { createGateway } from '@cline/llms';\n\nconst sse = (events) => events.map((e) => `event: ${e.type}\\ndata: ${JSON.stringify(e)}\\n\\n`).join('');\nconst start = { type: 'message_start', message: { id: 'msg_1', type: 'message', role: 'assistant', model: 'claude-sonnet-4-5',\n  content: [], stop_reason: null, stop_sequence: null, usage: { input_tokens: 10, output_tokens: 0 } } };\nconst end = (reason) => [{ type: 'message_delta', delta: { stop_reason: reason, stop_sequence: null }, usage: { output_tokens: 5 } },\n                         { type: 'message_stop' }];\nconst replies = [\n  // 1: some text, then an in-stream error event (HTTP 200)\n  sse([start, { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },\n       { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: 'PARTIAL-FROM-FAILED-ATTEMPT' } },\n       { type: 'error', error: { type: 'overloaded_error', message: 'Overloaded' } }]),\n  // 2: the stream retry succeeds with a tool call only\n  sse([start, { type: 'content_block_start', index: 0, content_block: { type: 'tool_use', id: 'toolu_1', name: 'search', input: {} } },\n       { type: 'content_block_delta', index: 0, delta: { type: 'input_json_delta', partial_json: '{\"query\":\"needle\"}' } },\n       { type: 'content_block_stop', index: 0 }, ...end('tool_use')]),\n  // 3: final answer\n  sse([start, { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },\n       { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: 'Done.' } },\n       { type: 'content_block_stop', index: 0 }, ...end('end_turn')]),\n];\nconst requests = [];\nconst fetch = async (url, init) => {\n  requests.push(JSON.parse(init.body));\n  return new Response(replies.shift(), { headers: { 'content-type': 'text/event-stream' } });\n};\n\nconst gateway = createGateway({ providerConfigs: [{ providerId: 'anthropic', apiKey: 'test', fetch }] });\nconst agent = new Agent({\n  model: gateway.createAgentModel({ providerId: 'anthropic', modelId: 'claude-sonnet-4-5' }),\n  tools: [{ name: 'search', description: 'Search the codebase.',\n            inputSchema: { type: 'object', properties: { query: { type: 'string' } }, required: ['query'] },\n            execute: async () => 'notes.txt: needle' }],\n});\nawait agent.run('Search the codebase for needle.');\n\nconsole.log(`requests: ${requests.length}`);\nfor (const m of requests.at(-1).messages) console.log(m.role, JSON.stringify(m.content).slice(0, 160));\n```\n\nOutput: the third request carries the failed attempt's text in the same assistant message as the retry's tool call.\n\n```\nrequests: 3\nuser [{\"type\":\"text\",\"text\":\"Search the codebase for needle.\",\"cache_control\":{\"type\":\"ephemeral\"}}]\nassistant [{\"type\":\"text\",\"text\":\"PARTIAL-FROM-FAILED-ATTEMPT\"},{\"type\":\"tool_use\",\"id\":\"toolu_1\",\"name\":\"search\",\"input\":{\"query\":\"needle\"}}]\nuser [{\"type\":\"tool_result\",\"tool_use_id\":\"toolu_1\",\"content\":\"notes.txt: needle\"}]\n```\n\nThe CLI behaves the same: `cline --json -P anthropic \"Search the codebase for needle.\"` against an endpoint that returns these three responses.\n\n### Provider/Model\n\nanthropic:claude-sonnet-4-5\n\n### Diagnostics\n\n3.0.73\n\n### System Information\n\nOS: Ubuntu 24.04.5 LTS (x86_64)\nNode: v24.15.0",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/cline/cline/issues/15323/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/cline/cline/issues/15323/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null,
+  "pinned_comment": null
+}

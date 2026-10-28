@@ -1,0 +1,82 @@
+{
+  "url": "https://api.github.com/repos/cline/cline/issues/15285",
+  "repository_url": "https://api.github.com/repos/cline/cline",
+  "labels_url": "https://api.github.com/repos/cline/cline/issues/15285/labels{/name}",
+  "comments_url": "https://api.github.com/repos/cline/cline/issues/15285/comments",
+  "events_url": "https://api.github.com/repos/cline/cline/issues/15285/events",
+  "html_url": "https://github.com/cline/cline/issues/15285",
+  "id": 5999765071,
+  "node_id": "I_kwDOMSqWwc8AAAABZZ0mTw",
+  "number": 15285,
+  "title": "CLI repository diff summary omits staged changes",
+  "user": {
+    "login": "Ricardo-M-L",
+    "id": 69202550,
+    "node_id": "MDQ6VXNlcjY5MjAyNTUw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/69202550?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Ricardo-M-L",
+    "html_url": "https://github.com/Ricardo-M-L",
+    "followers_url": "https://api.github.com/users/Ricardo-M-L/followers",
+    "following_url": "https://api.github.com/users/Ricardo-M-L/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Ricardo-M-L/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Ricardo-M-L/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Ricardo-M-L/subscriptions",
+    "organizations_url": "https://api.github.com/users/Ricardo-M-L/orgs",
+    "repos_url": "https://api.github.com/users/Ricardo-M-L/repos",
+    "events_url": "https://api.github.com/users/Ricardo-M-L/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Ricardo-M-L/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2026-10-23T14:35:42Z",
+  "updated_at": "2026-10-23T14:35:47Z",
+  "closed_at": null,
+  "assignee": null,
+  "author_association": "NONE",
+  "issue_field_values": [
+
+  ],
+  "type": null,
+  "active_lock_reason": null,
+  "sub_issues_summary": {
+    "total": 0,
+    "completed": 0,
+    "percent_completed": 0
+  },
+  "issue_dependencies_summary": {
+    "blocked_by": 0,
+    "total_blocked_by": 0,
+    "blocking": 0,
+    "total_blocking": 0
+  },
+  "body": "### What happens\n\nIn the interactive CLI, the repository diff summary disappears after staging all changes. `readRepoStatus()` runs `git diff --shortstat`, which compares the working tree with the index and therefore excludes staged changes.\n\n### Reproduction\n\n1. Start in a Git repository with a commit.\n2. Modify a tracked file. The CLI reports its additions/deletions.\n3. Run `git add` for that file and refresh the CLI repository status.\n4. The summary becomes empty even though the changes have not been committed.\n\nThe same omission affects staged new files mixed with unstaged edits. Comparing the working tree with `HEAD` retains the net changes without adding the staged and unstaged counts twice.\n\nReproduced against c441897f with actual temporary Git repositories; no provider credentials are involved.\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/cline/cline/issues/15285/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/cline/cline/issues/15285/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null,
+  "pinned_comment": null
+}
