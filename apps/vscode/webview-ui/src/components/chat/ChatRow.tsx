@@ -1163,4 +1163,6 @@ export const ChatRowContent = memo(
 				}
 		}
 	},
+	// memo does shallow comparison of props, so we need to do deep comparison of arrays/objects whose properties might change
+	deepEqual,
 )
