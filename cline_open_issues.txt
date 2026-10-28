@@ -1,0 +1,36 @@
+15405 Cline extension is completely empty after giving the response in planmode or actmode. Have to restart the Cursor to see the response. It goes again after next run.
+15392 Failed to process successful response: TypeError: terminated: BodyTimeoutError: Body Timeout Error (UND_ERR_BODY_TIMEOUT)
+15386 Cline Desktop + Qwen3.8-flash-next
+15382 Desktop App (v0.0.49): Missing Plan/Act mode toggle and Auto Approve controls in the UI
+15379 CLI 3.0.74: Switching OpenAI-compatible models drops reasoning metadata and resets reasoning to none
+15377 Commit search drops the quotes from the query, so quoted searches return the wrong commits
+15372 Cline Desktop: Open Settings shortcut does not work in Cline Desktop.
+15360 VS Code: extension host OOM in long tasks — subscribeToState re-serializes full state (17 MB) on every streamed event
+15354 Cline send my files without approving
+15346 MCP tool discovery ignores tools/list pages after nextCursor
+15344 CLI shell tools inherit shared Hub startup environment instead of launching client
+15329 GNOME workspace switch causes false "Cline encountered an error" notification despite successful prompt
+15327 OpenAI Compatible Base URL and API Key inputs automatically reset to default values
+15324 Gemini: an in-stream error is dropped (bundled @ai-sdk/google 4.0.84), and a function call from the failed response is executed
+15323 Stream retry keeps the failed attempt's text: the saved assistant message mixes text the model never sent with the retry's tool call
+15319 Model picker still lists withdrawn OpenRouter free model (qwen/qwen3.8-27b:free); model catalog out of sync with provider's live list
+15307 Broken Anthropic prompt caching on tool calls in v4.1.25 ("Next" engine) resulting in cost spikes.
+15294 CLI --timeout accepts values like "10m" as seconds, and schedule turns invalid timeouts into 1 second
+15290 Allow an openai-compatible provider's key to come from a command, like Claude Code's apiKeyHelper
+15285 CLI repository diff summary omits staged changes
+15284 Cline Cli with openai-compatible provider don't recognize OPENAI_API_KEY variable
+15281 CLI MCP wizard strips backslashes from stdio commands, breaking Windows paths (C:\Users\... becomes C:Users...)
+15280 SVG code cannot be seen in the bubble
+15275 Light local Ollama models that use to work fine on legacy MacBook hardware now keep timing out.
+15274 Desktop app starts up, but complains that desktop backend endpoint not ready
+15271 CLI: publish musl Linux builds (bun-linux-x64-musl / bun-linux-arm64-musl)
+15269 General model disobedience
+15267 Windows notifications remain blocked in Cline Desktop v0.0.48
+15266 Cline detected repeated mistakes or tool calls and needs your guidance. Latest: Detected 5 consecutive identical calls to `team_cleanup`; stopping to avoid a loop. How should Cline continue?
+15262 run_commands reports exit status 1 for two native commands with different exit codes
+15261 Chat thread duplicate to x4 with x4 cost too!
+15260 Billing: accidental annual upgrade without confirmation — $82.48 refund requested
+15259 Act mode ignoring explicit commands and workspace rules
+15255 Plan Mode repeatedly outputs tool-call JSON instead of completing file investigation
+15253 [JetBrains] Chat view forces scroll back to bottom, making it impossible to read earlier parts of a conversation
+15250 Error loading webview provided by 'saoudrizwan.claude-dev': Error: Could not register service worker

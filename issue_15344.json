@@ -1,0 +1,82 @@
+{
+  "url": "https://api.github.com/repos/cline/cline/issues/15344",
+  "repository_url": "https://api.github.com/repos/cline/cline",
+  "labels_url": "https://api.github.com/repos/cline/cline/issues/15344/labels{/name}",
+  "comments_url": "https://api.github.com/repos/cline/cline/issues/15344/comments",
+  "events_url": "https://api.github.com/repos/cline/cline/issues/15344/events",
+  "html_url": "https://github.com/cline/cline/issues/15344",
+  "id": 6032669328,
+  "node_id": "I_kwDOMSqWwc8AAAABZ5M6kA",
+  "number": 15344,
+  "title": "CLI shell tools inherit shared Hub startup environment instead of launching client",
+  "user": {
+    "login": "djbclark",
+    "id": 131936,
+    "node_id": "MDQ6VXNlcjEzMTkzNg==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/131936?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/djbclark",
+    "html_url": "https://github.com/djbclark",
+    "followers_url": "https://api.github.com/users/djbclark/followers",
+    "following_url": "https://api.github.com/users/djbclark/following{/other_user}",
+    "gists_url": "https://api.github.com/users/djbclark/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/djbclark/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/djbclark/subscriptions",
+    "organizations_url": "https://api.github.com/users/djbclark/orgs",
+    "repos_url": "https://api.github.com/users/djbclark/repos",
+    "events_url": "https://api.github.com/users/djbclark/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/djbclark/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2026-10-26T03:17:39Z",
+  "updated_at": "2026-10-26T03:17:43Z",
+  "closed_at": null,
+  "assignee": null,
+  "author_association": "NONE",
+  "issue_field_values": [
+
+  ],
+  "type": null,
+  "active_lock_reason": null,
+  "sub_issues_summary": {
+    "total": 0,
+    "completed": 0,
+    "percent_completed": 0
+  },
+  "issue_dependencies_summary": {
+    "blocked_by": 0,
+    "total_blocked_by": 0,
+    "blocking": 0,
+    "total_blocking": 0
+  },
+  "body": "Cline CLI 3.0.73 on macOS reuses an existing local Hub. A shell tool invoked by the model then sees the terminal context from whichever client started that Hub.\n\n## Reproduction\n\n1. Launch Cline in terminal A and leave its Hub running.\n2. In terminal B export a fresh non-secret canary, launch the interactive CLI, and ask it to run a shell probe comparing that canary and terminal identifiers with terminal B.\n3. Compare only presence/equality; do not print credentials or a complete environment.\n\n## Observed\n\nA real model-invoked Python child ran under the pre-existing Hub. Terminal pane/tab/workspace identifiers differed from the new launching shell, TERM_PROGRAM was absent, and five fresh synthetic environment canaries were absent. The expectation was captured from terminal B before launching its TUI; this did not independently capture the TUI process environment.\n\n## Expected\n\nShell commands receive session-scoped launch context. Two clients sharing the Hub must not inherit each other’s terminal identifiers, and no request may mutate the Hub’s global environment.\n\n## Source diagnosis\n\nReproduced release: cli-v3.0.73. Confirmed in main dab482348ffd83d1065dfcf8b538076608925a79: HubRuntimeHost.startSession sends no shell environment in session.create; handleSessionCreate starts a Hub-local runtime; the built-in shell executor spawns with a merge of process.env and executor overrides. The daemon therefore supplies its startup environment to later sessions. The released shell executor has the same merge.\n\nRelated but different: [the hook lifecycle issue](https://github.com/cline/cline/issues/14961) and [its related PR](https://github.com/cline/cline/pull/15012) concern TaskStart/TaskResume selection from daemon environment. Refreshed issues and PR searches found no exact shell-environment duplicate.\n\n## Scope\n\nNo existing Hub was restarted. An isolated data directory reached authentication onboarding, so no isolated authenticated model comparison is claimed.\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/cline/cline/issues/15344/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/cline/cline/issues/15344/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null,
+  "pinned_comment": null
+}

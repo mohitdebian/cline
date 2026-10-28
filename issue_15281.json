@@ -1,0 +1,92 @@
+{
+  "url": "https://api.github.com/repos/cline/cline/issues/15281",
+  "repository_url": "https://api.github.com/repos/cline/cline",
+  "labels_url": "https://api.github.com/repos/cline/cline/issues/15281/labels{/name}",
+  "comments_url": "https://api.github.com/repos/cline/cline/issues/15281/comments",
+  "events_url": "https://api.github.com/repos/cline/cline/issues/15281/events",
+  "html_url": "https://github.com/cline/cline/issues/15281",
+  "id": 5993819326,
+  "node_id": "I_kwDOMSqWwc8AAAABZUJsvg",
+  "number": 15281,
+  "title": "CLI MCP wizard strips backslashes from stdio commands, breaking Windows paths (C:\\Users\\... becomes C:Users...)",
+  "user": {
+    "login": "notlakshitha",
+    "id": 85143235,
+    "node_id": "MDQ6VXNlcjg1MTQzMjM1",
+    "avatar_url": "https://avatars.githubusercontent.com/u/85143235?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/notlakshitha",
+    "html_url": "https://github.com/notlakshitha",
+    "followers_url": "https://api.github.com/users/notlakshitha/followers",
+    "following_url": "https://api.github.com/users/notlakshitha/following{/other_user}",
+    "gists_url": "https://api.github.com/users/notlakshitha/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/notlakshitha/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/notlakshitha/subscriptions",
+    "organizations_url": "https://api.github.com/users/notlakshitha/orgs",
+    "repos_url": "https://api.github.com/users/notlakshitha/repos",
+    "events_url": "https://api.github.com/users/notlakshitha/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/notlakshitha/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 9414822871,
+      "node_id": "LA_kwDOMSqWwc8AAAACMSrL1w",
+      "url": "https://api.github.com/repos/cline/cline/labels/CLI",
+      "name": "CLI",
+      "color": "d93f0b",
+      "default": false,
+      "description": "Issues related to the Cline CLI",
+      "archived_at": null,
+      "archived_by": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2026-10-23T07:32:19Z",
+  "updated_at": "2026-10-23T07:32:30Z",
+  "closed_at": null,
+  "assignee": null,
+  "author_association": "NONE",
+  "issue_field_values": [
+
+  ],
+  "type": null,
+  "active_lock_reason": null,
+  "sub_issues_summary": {
+    "total": 0,
+    "completed": 0,
+    "percent_completed": 0
+  },
+  "issue_dependencies_summary": {
+    "blocked_by": 0,
+    "total_blocked_by": 0,
+    "blocking": 0,
+    "total_blocking": 0
+  },
+  "body": "### Cline Surface\n\nCLI\n\n### Cline Version\n\nCLI 3.0.73 (`main` at `1619168`)\n\n### Beta version\n\n- [ ] I am using a beta version of Cline\n\n### What happened?\n\nThe interactive MCP wizard (`apps/cli/src/wizards/mcp/index.ts`) splits the stdio command with `parseStdioCommand` and stores `parts[0]` as `command` and the rest as `args`.\n\n`parseStdioCommand` treats every backslash as an escape character, inside double quotes and outside quotes alike, and drops it:\n\n```ts\nif (char === \"\\\\\") {\n  escaping = true;\n  continue;\n}\n```\n\nOn Windows, every path the user types loses its separators. A server added with `node C:\\Users\\me\\mcp\\server.js` is saved with the argument `C:Usersmemcpserver.js`, so the server fails to start because the file doesn't exist. Quoting the path, as most users do for `Program Files`, does not help, because escapes are processed inside double quotes too.\n\n### Possible Solution\n\n1. Treat a backslash as an escape only when it comes before a quote character, or before whitespace outside quotes (`my\\ dir`).\n2. Keep any other backslash literally, and never process escapes inside single quotes.\n3. Add Windows-path cases next to the existing `parses quoted stdio command arguments` test in `settings.test.ts`.\n\n```ts\nexport function parseStdioCommand(input: string): string[] {\n  const tokens: string[] = [];\n  let current = \"\";\n  let quote: '\"' | \"'\" | undefined;\n  const chars = [...input.trim()];\n  for (let i = 0; i < chars.length; i++) {\n    const char = chars[i]!;\n    // A backslash escapes only a quote or whitespace, so Windows paths such as\n    // C:\\Users\\me\\server.js keep their separators.\n    if (char === \"\\\\\" && quote !== \"'\") {\n      const next = chars[i + 1];\n      if (next !== undefined && (next === '\"' || next === \"'\" || (!quote && /\\s/.test(next)))) {\n        current += next;\n        i++;\n        continue;\n      }\n      current += char;\n      continue;\n    }\n    if (quote) {\n      if (char === quote) quote = undefined;\n      else current += char;\n      continue;\n    }\n    if (char === '\"' || char === \"'\") { quote = char; continue; }\n    if (/\\s/.test(char)) {\n      if (current) { tokens.push(current); current = \"\"; }\n      continue;\n    }\n    current += char;\n  }\n  if (current) tokens.push(current);\n  return tokens;\n}\n```\n\nWith this version:\n\n- Both commands above keep their backslashes.\n- `node my\\ dir/server.js --name \"a \\\"b\\\"\"` still gives `[\"node\",\"my dir/server.js\",\"--name\",\"a \\\"b\\\"\"]`.\n- The existing `npx -y \"@scope/server name\" --root \"my dir\"` case still gives the same result.\n\nI'm happy to send a PR.\n\n### Steps to reproduce\n\nCall the parser the wizard uses:\n\n```ts\nparseStdioCommand(String.raw`node C:\\Users\\me\\mcp\\server.js`)\n// [\"node\",\"C:Usersmemcpserver.js\"]\n\nparseStdioCommand(String.raw`\"C:\\Program Files\\nodejs\\node.exe\" C:\\tools\\server.js`)\n// [\"C:Program Filesnodejsnode.exe\",\"C:toolsserver.js\"]\n```\n\nThe same happens through `cline mcp` â†’ add server â†’ stdio, entering either command above.\n\nExpected:\n\n```\n[\"node\",\"C:\\\\Users\\\\me\\\\mcp\\\\server.js\"]\n[\"C:\\\\Program Files\\\\nodejs\\\\node.exe\",\"C:\\\\tools\\\\server.js\"]\n```\n\n### Provider/Model\n\nNot applicable.\n\n### Diagnostics\n\nReproduced by running `parseStdioCommand` from source with `npx tsx`.\n\n### System Information\n\nLinux 6.12 (Debian 13), Node.js 20.19.2. The parser is platform-independent, but the problem affects Windows paths.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/cline/cline/issues/15281/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/cline/cline/issues/15281/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null,
+  "pinned_comment": null
+}

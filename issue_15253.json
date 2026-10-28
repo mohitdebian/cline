@@ -1,0 +1,92 @@
+{
+  "url": "https://api.github.com/repos/cline/cline/issues/15253",
+  "repository_url": "https://api.github.com/repos/cline/cline",
+  "labels_url": "https://api.github.com/repos/cline/cline/issues/15253/labels{/name}",
+  "comments_url": "https://api.github.com/repos/cline/cline/issues/15253/comments",
+  "events_url": "https://api.github.com/repos/cline/cline/issues/15253/events",
+  "html_url": "https://github.com/cline/cline/issues/15253",
+  "id": 5960599535,
+  "node_id": "I_kwDOMSqWwc8AAAABY0eH7w",
+  "number": 15253,
+  "title": "[JetBrains] Chat view forces scroll back to bottom, making it impossible to read earlier parts of a conversation",
+  "user": {
+    "login": "eanon",
+    "id": 6631714,
+    "node_id": "MDQ6VXNlcjY2MzE3MTQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/6631714?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/eanon",
+    "html_url": "https://github.com/eanon",
+    "followers_url": "https://api.github.com/users/eanon/followers",
+    "following_url": "https://api.github.com/users/eanon/following{/other_user}",
+    "gists_url": "https://api.github.com/users/eanon/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/eanon/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/eanon/subscriptions",
+    "organizations_url": "https://api.github.com/users/eanon/orgs",
+    "repos_url": "https://api.github.com/users/eanon/repos",
+    "events_url": "https://api.github.com/users/eanon/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/eanon/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 9309535407,
+      "node_id": "LA_kwDOMSqWwc8AAAACKuQ8rw",
+      "url": "https://api.github.com/repos/cline/cline/labels/JetBrains",
+      "name": "JetBrains",
+      "color": "7613c2",
+      "default": false,
+      "description": "Issues specific to JetBrains IDEs",
+      "archived_at": null,
+      "archived_by": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2026-10-21T12:36:38Z",
+  "updated_at": "2026-10-21T12:36:48Z",
+  "closed_at": null,
+  "assignee": null,
+  "author_association": "NONE",
+  "issue_field_values": [
+
+  ],
+  "type": null,
+  "active_lock_reason": null,
+  "sub_issues_summary": {
+    "total": 0,
+    "completed": 0,
+    "percent_completed": 0
+  },
+  "issue_dependencies_summary": {
+    "blocked_by": 0,
+    "total_blocked_by": 0,
+    "blocking": 0,
+    "total_blocking": 0
+  },
+  "body": "### Cline Surface\n\nJetBrains Plugin\n\n### Cline Version\n\n4.1.23\n\n### Beta version\n\n- [ ] I am using a beta version of Cline\n\n### What happened?\n\n**Environment**\n- Cline JetBrains plugin, core 2.0.7\n- PyCharm Professional 2026.2, Windows 10 Pro FR\n- Laptop, keyboard + touchpad only (no mouse wheel)\n- [Not tested on the VS Code extension]\n\n**Problem**\nIn a long conversation, any attempt to scroll up (ArrowUp / PageUp / Home on the keyboard, or touchpad) is immediately undone: the view snaps back to the bottom. This also happens **after streaming has finished**, so it is not only an \"auto-follow while streaming\" issue. Long responses can only be read from their end, and earlier messages are effectively unreachable.\n\n**Expected**\nAuto-scroll should follow new content only while the user is already at the bottom. Once the user scrolls up, the view should stay where they put it until they scroll back down (or send a message).\n\n### Steps to reproduce\n\n1. Open a conversation with a long response or many messages.\n2. Scroll up with the keyboard or touchpad.\n3. The view returns to the bottom.\n\n**Findings**\nThe scroll container is `[data-virtuoso-scroller=\"true\"]`. The behavior stops completely if programmatic scrolling on that element is blocked while the user has scrolled up: overriding `Element.prototype.scrollTo`, `scrollBy`, `scrollIntoView` and the `scrollTop` setter to no-op when the element is \"user-locked\" fixes it. So the snap-back comes from programmatic scroll calls, not from the browser. I have not identified which component triggers them.\n\nWorkaround (prepended to `webview-ui/build/assets/index.js`):\n[fix-scroll.js](https://github.com/user-attachments/files/33768585/fix-scroll.js)\n\nTo apply fix-scroll.js, I used this powershell script:\n```\n$dir = \"$env:APPDATA\\JetBrains\\PyCharm2026.2\\plugins\\cline\\core\\2.0.7\\extension\\webview-ui\\build\\assets\"\nCopy-Item \"$dir\\index.js\" \"$dir\\index.js.bak\"\n$fix  = [IO.File]::ReadAllText(\"$PWD\\fix-scroll.js\")\n$orig = [IO.File]::ReadAllText(\"$dir\\index.js.bak\")\n[IO.File]::WriteAllText(\"$dir\\index.js\", $fix + \"`n\" + $orig, (New-Object Text.UTF8Encoding $false))\n```\n\n\n### Provider/Model\n\nWhatever... Claude Sonnet | Haiku, Gemini Flash, Deepseek, Kimi.\n\n### Diagnostics\n\nPyCharm 2026.2.3\nBuild #PY-262.10968.92, built on September 18, 2026\nSource revision: eea96f98b1a38\nRuntime version: 25.0.4+1-b508.27 amd64\nVM: OpenJDK 64-Bit Server VM by JetBrains s.r.o.\nToolkit: sun.awt.windows.WToolkit\nWindows 10.0\nException reporter ID: 29042516796170f-41d5-4eaf-b39c-cf056fd233be\nJCEF version: 144.0.15-262-b37\nGC: G1 Young Generation, G1 Concurrent GC, G1 Old Generation\nMemory: 2048MiB\nCores: 8\nRegistry:\n  ide.experimental.ui=true\n  trace.state.event.service.url=https://api.jetbrains.cloud/trace-status\nNon-Bundled Plugins:\n  bot.cline (2.0.7)\n  ru.adelf.idea.dotenv (262.10968.117)\n\n\n### System Information\n\nPC: laptop Dell Latitude 5590\nOS: Windows 10 Pro FR\nCPU: Intel i5-8350U (4-core, 8-thread)\nGPU: Intel UHD Graphics 620 (1GB)\nRAM: 32GB DDR4\nSSD: EMTEC X250 (1TB)",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/cline/cline/issues/15253/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/cline/cline/issues/15253/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null,
+  "pinned_comment": null
+}

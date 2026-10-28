@@ -1,0 +1,82 @@
+{
+  "url": "https://api.github.com/repos/cline/cline/issues/15329",
+  "repository_url": "https://api.github.com/repos/cline/cline",
+  "labels_url": "https://api.github.com/repos/cline/cline/issues/15329/labels{/name}",
+  "comments_url": "https://api.github.com/repos/cline/cline/issues/15329/comments",
+  "events_url": "https://api.github.com/repos/cline/cline/issues/15329/events",
+  "html_url": "https://github.com/cline/cline/issues/15329",
+  "id": 6022037714,
+  "node_id": "I_kwDOMSqWwc8AAAABZvEA0g",
+  "number": 15329,
+  "title": "GNOME workspace switch causes false \"Cline encountered an error\" notification despite successful prompt",
+  "user": {
+    "login": "carlgustafsson01",
+    "id": 13631361,
+    "node_id": "MDQ6VXNlcjEzNjMxMzYx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/13631361?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/carlgustafsson01",
+    "html_url": "https://github.com/carlgustafsson01",
+    "followers_url": "https://api.github.com/users/carlgustafsson01/followers",
+    "following_url": "https://api.github.com/users/carlgustafsson01/following{/other_user}",
+    "gists_url": "https://api.github.com/users/carlgustafsson01/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/carlgustafsson01/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/carlgustafsson01/subscriptions",
+    "organizations_url": "https://api.github.com/users/carlgustafsson01/orgs",
+    "repos_url": "https://api.github.com/users/carlgustafsson01/repos",
+    "events_url": "https://api.github.com/users/carlgustafsson01/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/carlgustafsson01/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2026-10-25T07:32:31Z",
+  "updated_at": "2026-10-25T07:43:05Z",
+  "closed_at": null,
+  "assignee": null,
+  "author_association": "NONE",
+  "issue_field_values": [
+
+  ],
+  "type": null,
+  "active_lock_reason": null,
+  "sub_issues_summary": {
+    "total": 0,
+    "completed": 0,
+    "percent_completed": 0
+  },
+  "issue_dependencies_summary": {
+    "blocked_by": 0,
+    "total_blocked_by": 0,
+    "blocking": 0,
+    "total_blocking": 0
+  },
+  "body": "### Cline Surface\n\nDesktop App\n\n### Cline Version\n\n0.0.48\n\n### Beta version\n\n- [ ] I am using a beta version of Cline\n\n### What happened?\n\nOn Fedora Linux with GNOME (Wayland), switching to a different workspace immediately after sending a prompt causes a false error notification: \"Task Failed: Cline encountered an error while running this task\" appears even though the prompt completes successfully without any issues.\n\nThe expected behavior is that the prompt should continue running in the background without showing an error — the notification appears to be triggered erroneously by the workspace switch itself, not by any actual problem with the prompt execution.\n\n### Steps to reproduce\n\nOpen Cline Desktop App (v0.0.48) on Fedora Linux with GNOME (Wayland)\nSend a prompt to Cline using Deepseek v4 pro\nImmediately after sending (within ~1–2 seconds), switch to a different GNOME workspace (e.g., via Ctrl+Alt+Arrow or three-finger swipe gesture on trackpad)\nObserve the notification: \"Task Failed: Cline encountered an error while running this task\"\nSwitch back to the original workspace — the prompt has actually completed (or is still running) without any real error\nProvider/Model: deepseek/deepseek-v4-pro (justera gärna om du använder en annan provider)\n\n\n### Provider/Model\n\ncline:Deekseek/Deepseek-v4-pro\n\n### Diagnostics\n\nv0.0.48\n\n### System Information\n\nOperating System: Fedora Linux 44\nHardware: SAMSUNG ELECTRONICS CO., LTD. 960XHA\nProcessor: Intel® Core™ Ultra 7 256V × 8\nRAM: 16GB\nDesktop Environment: GNOME 50 on Wayland\nWorkspace Switching: Ctrl+Alt+Arrow / three-finger swipe gesture",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/cline/cline/issues/15329/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/cline/cline/issues/15329/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null,
+  "pinned_comment": null
+}

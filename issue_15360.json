@@ -1,0 +1,92 @@
+{
+  "url": "https://api.github.com/repos/cline/cline/issues/15360",
+  "repository_url": "https://api.github.com/repos/cline/cline",
+  "labels_url": "https://api.github.com/repos/cline/cline/issues/15360/labels{/name}",
+  "comments_url": "https://api.github.com/repos/cline/cline/issues/15360/comments",
+  "events_url": "https://api.github.com/repos/cline/cline/issues/15360/events",
+  "html_url": "https://github.com/cline/cline/issues/15360",
+  "id": 6044210667,
+  "node_id": "I_kwDOMSqWwc8AAAABaENV6w",
+  "number": 15360,
+  "title": "VS Code: extension host OOM in long tasks — subscribeToState re-serializes full state (17 MB) on every streamed event",
+  "user": {
+    "login": "gregtakacs",
+    "id": 20398441,
+    "node_id": "MDQ6VXNlcjIwMzk4NDQx",
+    "avatar_url": "https://avatars.githubusercontent.com/u/20398441?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/gregtakacs",
+    "html_url": "https://github.com/gregtakacs",
+    "followers_url": "https://api.github.com/users/gregtakacs/followers",
+    "following_url": "https://api.github.com/users/gregtakacs/following{/other_user}",
+    "gists_url": "https://api.github.com/users/gregtakacs/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/gregtakacs/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/gregtakacs/subscriptions",
+    "organizations_url": "https://api.github.com/users/gregtakacs/orgs",
+    "repos_url": "https://api.github.com/users/gregtakacs/repos",
+    "events_url": "https://api.github.com/users/gregtakacs/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/gregtakacs/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 9309534643,
+      "node_id": "LA_kwDOMSqWwc8AAAACKuQ5sw",
+      "url": "https://api.github.com/repos/cline/cline/labels/VS%20Code",
+      "name": "VS Code",
+      "color": "5dcfe7",
+      "default": false,
+      "description": "Issues specific to VS Code",
+      "archived_at": null,
+      "archived_by": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 1,
+  "created_at": "2026-10-26T16:50:16Z",
+  "updated_at": "2026-10-26T16:50:26Z",
+  "closed_at": null,
+  "assignee": null,
+  "author_association": "NONE",
+  "issue_field_values": [
+
+  ],
+  "type": null,
+  "active_lock_reason": null,
+  "sub_issues_summary": {
+    "total": 0,
+    "completed": 0,
+    "percent_completed": 0
+  },
+  "issue_dependencies_summary": {
+    "blocked_by": 0,
+    "total_blocked_by": 0,
+    "blocking": 0,
+    "total_blocking": 0
+  },
+  "body": "### Cline Surface\n\nVSCode Extension\n\n### Cline Version\n\n4.1.25\n\n### Beta version\n\n- [ ] I am using a beta version of Cline\n\n### What happened?\n\nIn long tasks the VS Code (Remote-WSL) extension host dies from V8 heap exhaustion. Cline's panel resets, and reopening the same task brings the crash back within 1–2 minutes, so the task becomes a crash loop.\n\n`remoteagent.log` at each crash:\n\n```\n<stderr> FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory\nExtension Host Process exited with code: null, signal: SIGABRT.\n```\n\nThe last GC trace lines show the heap at its ~4 GB ceiling (`... -> 4108.5 (4131.5) MB ... allocation failure; scavenge might not succeed`). There were 33 of these exits in 6 days (18 on 10-21, 6 on 10-23, 9 on 10-26).\n\nThe Cline output channel shows what fills the heap. While a turn streams, the **entire state** is re-serialized and pushed to the webview about every 0.4–0.6 s:\n\n```\nWARN [TelemetryService] Large gRPC response: cline.StateService.subscribeToState size=17.1MB\n```\n\n| Extension-host run | `subscribeToState` > 4 MB warnings | Size range | Outcome |\n|---|---|---|---|\n| 10-21 | 25,719 | 4.0 – 20.5 MB | 18 OOM exits |\n| 10-22/23 | 38,182 | 8.6 – 17.6 MB | 6 OOM exits |\n| 10-26 | 4,617 | 16.6 – 17.3 MB | 9 OOM exits |\n\nOne run on 10-26 issued 1,194 of these pushes in 41 minutes, **~20 GB of JSON serialized**, and then the host died. After restarting with the same task reopened, it lasted 160 pushes (~70 s).\n\nThe task involved has **5,824 messages**: 3,004 tool_use/tool_result pairs and 2,784 thinking blocks. Its `<id>.messages.json` is 17.3 MB, the same size as each push. Context compaction ran (`<id>.compaction.json` exists), but it shrinks only what goes to the model, not the message list sent to the webview, so the push keeps growing with the task's lifetime.\n\n**Where it comes from (4.1.25 `dist/extension.js`, de-minified names approximate):**\n\n```js\n// statePostDebouncer = new Debouncer({ debounceMs: STATE_POST_DEBOUNCE_MS /* 50 */, flush: () => this.flushStateToWebview() })\n\nasync flushStateToWebview() {\n  const state = await this.getStateToPostToWebview()   // includes full clineMessages\n  await sendStateUpdate(state)\n}\n\nfunction sendStateUpdate(state) {\n  const stateJson = JSON.stringify(state)              // whole state, every time\n  captureGrpcResponseSize(Buffer.byteLength(stateJson, \"utf8\"))\n  for (const send of stateSubscribers) send({ stateJson }, false)\n}\n```\n\nSo each flush allocates the full ~17 MB string (≈34 MB as a V8 UTF-16 string if any non-Latin-1 content is present), the object graph built for it, and whatever the postMessage transport copies. That happens at the 50 ms debounce rate, bounded only by how long the stringify takes. Debouncing doesn't help once one flush costs as much as the interval between them.\n\n**What I have not proven:** I don't have a heap snapshot, so I can't say whether these strings are *retained*, as in #15031's JetBrains report (1,111 × 7.25 MB `stateJson` held by a suspended async-generator frame), or are just churn the GC can't keep up with. The symptom matches either way: the heap grows with task length × push rate until it hits the limit.\n\n**Expected:** memory use bounded independently of task length; streaming updates that don't re-send the full message history.\n\n**Suggestions:**\n1. Send `partialMessage` / message deltas while streaming, and full state only on structural changes. #4626 proposed state diff sync and was closed.\n2. Exclude `clineMessages` (or everything but a window of recent messages) from `subscribeToState`, and let the webview page older messages on demand.\n3. At minimum, scale the debounce with payload size, or skip a flush while the previous one is still being serialized or delivered.\n4. Let compaction (or an explicit \"archive\") also trim what the UI holds, so a long task isn't a time bomb when reopened.\n\n**Related:** #15031 (same `stateJson` payload, JetBrains/cline-core, OOM), #12419 (`subscribeToState` 4.1 MB → UI freeze, VS Code 3.86), #4626 (state diff sync proposal), #9541 (heap OOM).\n\n### Steps to reproduce\n\n1. VS Code + Cline 4.1.25 (Remote-WSL here, though nothing in the path looks WSL-specific).\n2. Run one long agentic task with a reasoning model. Thinking blocks and tool results inflate the history fastest. Keep going across several context compactions, until the history is a few thousand messages and `<id>.messages.json` is ~10+ MB.\n3. Watch the Cline output channel: `Large gRPC response: cline.StateService.subscribeToState size=…MB` appears on nearly every streamed event, growing over time.\n4. The extension host eventually exits with `JavaScript heap out of memory` / `SIGABRT`.\n5. Reopen the same task from history: the crash comes back within a minute or two of streaming.\n\nWorkaround: start a new task. Raising the extension host's heap would only push the crash further out.\n\n### Provider/Model\n\nOpenAI-Compatible (self-hosted llama.cpp / vLLM), Qwen3.8-27B with reasoning enabled. Not provider-specific: the allocation is in the extension's state sync, not the API path.\n\n### Diagnostics\n\nVS Code 1.142.0 (commit 6d62b1d5dace93a33b3a6d3eca1317bd5e15bcb1), Remote-WSL; extension host default heap limit (~4 GB).\n\n### System Information\n\nWindows + WSL2 (kernel 6.18.33.2-microsoft-standard-WSL2), 24 cores, 62 GB RAM (the system had plenty of free memory; the limit hit is V8's heap cap, not system RAM).\n",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/cline/cline/issues/15360/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/cline/cline/issues/15360/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null,
+  "pinned_comment": null
+}
