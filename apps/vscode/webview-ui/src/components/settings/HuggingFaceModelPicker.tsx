@@ -13,6 +13,7 @@ import { highlight } from "../history/HistoryView"
 import { ModelInfoView } from "./common/ModelInfoView"
 import { getModeSpecificFields } from "./utils/providerUtils"
 import { useApiConfigurationHandlers } from "./utils/useApiConfigurationHandlers"
+import DOMPurify from "dompurify"
 
 interface HuggingFaceModelPickerProps {
 	isPopup?: boolean
@@ -236,7 +237,7 @@ const HuggingFaceModelPicker: React.FC<HuggingFaceModelPickerProps> = ({ isPopup
 									role="option">
 									<div
 										className="[&_.model-item-highlight]:bg-(--vscode-editor-findMatchHighlightBackground) [&_.model-item-highlight]:text-inherit"
-										dangerouslySetInnerHTML={{ __html: result.html }}
+										dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(result.html) }}
 									/>
 								</div>
 							))}

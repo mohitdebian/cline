@@ -14,6 +14,7 @@ import { highlight } from "../history/HistoryView"
 import { ModelInfoView } from "./common/ModelInfoView"
 import { getModeSpecificFields } from "./utils/providerUtils"
 import { useApiConfigurationHandlers } from "./utils/useApiConfigurationHandlers"
+import DOMPurify from "dompurify"
 
 interface GroqModelPickerProps {
 	isPopup?: boolean
@@ -251,7 +252,7 @@ const GroqModelPicker: React.FC<GroqModelPickerProps> = ({ isPopup, currentMode 
 											: ""
 									}`}
 									dangerouslySetInnerHTML={{
-										__html: item.html,
+										__html: DOMPurify.sanitize(item.html),
 									}}
 									key={item.id}
 									onClick={() => {
