@@ -17,6 +17,7 @@ import { ModelInfoView } from "./common/ModelInfoView"
 import ReasoningEffortSelector from "./ReasoningEffortSelector"
 import { filterOpenRouterModelIds, getModeSpecificFields } from "./utils/providerUtils"
 import { useApiConfigurationHandlers } from "./utils/useApiConfigurationHandlers"
+import DOMPurify from "dompurify"
 
 // Star icon for favorites
 const StarIcon = ({ isFavorite, onClick }: { isFavorite: boolean; onClick: (e: React.MouseEvent) => void }) => {
@@ -311,7 +312,7 @@ const OpenRouterModelPicker: React.FC<OpenRouterModelPickerProps> = ({ isPopup, 
 										ref={(el) => (itemRefs.current[index] = el)}
 										role="option">
 										<div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-											<span dangerouslySetInnerHTML={{ __html: item.html }} />
+											<span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.html) }} />
 											<StarIcon
 												isFavorite={isFavorite}
 												onClick={(e) => {

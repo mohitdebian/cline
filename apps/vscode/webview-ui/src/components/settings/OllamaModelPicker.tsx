@@ -3,6 +3,7 @@ import Fuse from "fuse.js"
 import React, { KeyboardEvent, memo, useEffect, useMemo, useRef, useState } from "react"
 import styled from "styled-components"
 import { highlight } from "../history/HistoryView"
+import DOMPurify from "dompurify"
 
 const OLLAMA_MODEL_PICKER_Z_INDEX = 1_000
 
@@ -183,7 +184,7 @@ const OllamaModelPicker: React.FC<OllamaModelPickerProps> = ({
 								onMouseEnter={() => setSelectedIndex(index)}
 								ref={(el) => (itemRefs.current[index] = el)}
 								role="option">
-								<span dangerouslySetInnerHTML={{ __html: item.html }} />
+								<span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.html) }} />
 							</DropdownItem>
 						))}
 					</DropdownList>

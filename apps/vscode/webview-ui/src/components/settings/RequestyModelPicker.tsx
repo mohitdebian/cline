@@ -16,6 +16,7 @@ import { ModelInfoView } from "./common/ModelInfoView"
 import ReasoningEffortSelector from "./ReasoningEffortSelector"
 import { getModeSpecificFields } from "./utils/providerUtils"
 import { useApiConfigurationHandlers } from "./utils/useApiConfigurationHandlers"
+import DOMPurify from "dompurify"
 
 interface RequestyModelPickerProps {
 	isPopup?: boolean
@@ -237,7 +238,7 @@ const RequestyModelPicker: React.FC<RequestyModelPickerProps> = ({ isPopup, base
 							{modelSearchResults.map((item, index) => (
 								<DropdownItem
 									dangerouslySetInnerHTML={{
-										__html: item.html,
+										__html: DOMPurify.sanitize(item.html),
 									}}
 									isSelected={index === selectedIndex}
 									key={item.id}

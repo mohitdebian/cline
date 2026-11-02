@@ -6,6 +6,7 @@ import { useDynamicProviderSelection } from "@/hooks/useDynamicProviderSelection
 import { VSC_BUTTON_BACKGROUND, VSC_BUTTON_FOREGROUND, VSC_DESCRIPTION_FOREGROUND, VSC_FOREGROUND } from "@/utils/vscStyles"
 import { ModelInfoView } from "../common/ModelInfoView"
 import { useApiConfigurationHandlers } from "../utils/useApiConfigurationHandlers"
+import DOMPurify from "dompurify"
 
 interface OcaModelPickerProps {
 	apiConfiguration: ApiConfiguration | undefined
@@ -244,7 +245,7 @@ const OcaRestrictivePopup: React.FC<{
 				Disclaimer: Prohibited Data Submission
 			</h4>
 			<div className="overflow-y-auto flex-1 pr-2 mb-4 text-[13px] leading-normal text-(--vscode-foreground,#222) mask-[linear-gradient(to_bottom,black_96%,transparent_100%)]">
-				{bannerText && <div dangerouslySetInnerHTML={{ __html: bannerText }} />}
+				{bannerText && <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(bannerText) }} />}
 			</div>
 			<div className="text-right">
 				<VSCodeButton

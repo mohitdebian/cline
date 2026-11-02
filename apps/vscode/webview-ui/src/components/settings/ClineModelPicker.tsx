@@ -21,6 +21,7 @@ import FeaturedModelCard from "./FeaturedModelCard"
 import ReasoningEffortSelector from "./ReasoningEffortSelector"
 import { filterOpenRouterModelIds, getModeSpecificFields } from "./utils/providerUtils"
 import { useApiConfigurationHandlers } from "./utils/useApiConfigurationHandlers"
+import DOMPurify from "dompurify"
 
 // Star icon for favorites
 const StarIcon = ({ isFavorite, onClick }: { isFavorite: boolean; onClick: (e: React.MouseEvent) => void }) => {
@@ -538,7 +539,7 @@ const ClineModelPicker: React.FC<ClineModelPickerProps> = ({ isPopup, currentMod
 												alignItems: "center",
 											}}>
 											{/* biome-ignore lint/security/noDangerouslySetInnerHtml: highlight() returns sanitized model-id markup for matched search text */}
-											<span dangerouslySetInnerHTML={{ __html: item.html }} />
+											<span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.html) }} />
 											<StarIcon
 												isFavorite={isFavorite}
 												onClick={(e) => {

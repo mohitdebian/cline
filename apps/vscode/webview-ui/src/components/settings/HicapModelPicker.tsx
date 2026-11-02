@@ -9,6 +9,7 @@ import { StateServiceClient } from "@/services/grpc-client"
 import { highlight } from "../history/HistoryView"
 import { getModeSpecificFields } from "./utils/providerUtils"
 import { useApiConfigurationHandlers } from "./utils/useApiConfigurationHandlers"
+import DOMPurify from "dompurify"
 
 const HICAP_MODEL_PICKER_Z_INDEX = 1_000
 
@@ -222,7 +223,7 @@ const HicapModelPicker: React.FC<HicapModelPickerProps> = ({ isPopup, currentMod
 										ref={(el) => (itemRefs.current[index] = el)}
 										role="option">
 										<div className="flex justify-between items-center [&_.model-item-highlight]:bg-[var(--vscode-editor-findMatchHighlightBackground)] [&_.model-item-highlight]:text-inherit">
-											<span dangerouslySetInnerHTML={{ __html: item.html }} />
+											<span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.html) }} />
 											<StarIcon
 												isFavorite={isFavorite}
 												onClick={(e) => {
