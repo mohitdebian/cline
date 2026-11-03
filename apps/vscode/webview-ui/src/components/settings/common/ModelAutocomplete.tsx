@@ -4,6 +4,7 @@ import Fuse from "fuse.js"
 import { KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from "react"
 import styled from "styled-components"
 import { highlight } from "../../history/HistoryView"
+import DOMPurify from "dompurify"
 
 interface ModelAutocompleteProps {
 	models: Record<string, ModelInfo>
@@ -228,7 +229,7 @@ export const ModelAutocomplete = ({
 									onMouseEnter={() => setSelectedIndex(index)}
 									ref={(el) => (itemRefs.current[index] = el)}
 									role="option">
-									<span dangerouslySetInnerHTML={{ __html: item.html }} />
+									<span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.html) }} />
 								</DropdownItem>
 							))}
 						</DropdownList>

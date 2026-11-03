@@ -14,6 +14,7 @@ import { ModelInfoView } from "./common/ModelInfoView"
 import ReasoningEffortSelector from "./ReasoningEffortSelector"
 import { getModeSpecificFields } from "./utils/providerUtils"
 import { useApiConfigurationHandlers } from "./utils/useApiConfigurationHandlers"
+import DOMPurify from "dompurify"
 
 interface VercelModelPickerProps {
 	isPopup?: boolean
@@ -248,7 +249,7 @@ const VercelModelPicker: React.FC<VercelModelPickerProps> = ({ isPopup, currentM
 										onMouseEnter={() => setSelectedIndex(index)}
 										ref={(el) => (itemRefs.current[index] = el)}
 										role="option">
-										<span dangerouslySetInnerHTML={{ __html: item.html }} />
+										<span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.html) }} />
 									</DropdownItem>
 								))
 							) : (
