@@ -9,6 +9,7 @@ import { useDynamicProviderSelection } from "@/hooks/useDynamicProviderSelection
 import { useProviderModels } from "@/hooks/useProviderModels"
 import { useExtensionState } from "../../context/ExtensionStateContext"
 import { ModelsServiceClient } from "../../services/grpc-client"
+import { parseHighlightedText } from "../../utils/safe-highlight"
 import { highlight } from "../history/HistoryView"
 import { ModelInfoView } from "./common/ModelInfoView"
 import { getModeSpecificFields } from "./utils/providerUtils"
@@ -234,10 +235,9 @@ const HuggingFaceModelPicker: React.FC<HuggingFaceModelPickerProps> = ({ isPopup
 									onMouseEnter={() => setSelectedIndex(index)}
 									ref={(el: HTMLDivElement | null) => (itemRefs.current[index] = el)}
 									role="option">
-									<div
-										className="[&_.model-item-highlight]:bg-(--vscode-editor-findMatchHighlightBackground) [&_.model-item-highlight]:text-inherit"
-										dangerouslySetInnerHTML={{ __html: result.html }}
-									/>
+									<div className="[&_.model-item-highlight]:bg-(--vscode-editor-findMatchHighlightBackground) [&_.model-item-highlight]:text-inherit">
+										{parseHighlightedText(result.html)}
+									</div>
 								</div>
 							))}
 						</div>

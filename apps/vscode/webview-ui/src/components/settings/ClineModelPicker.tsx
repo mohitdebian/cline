@@ -15,6 +15,7 @@ import { useDynamicProviderSelection } from "@/hooks/useDynamicProviderSelection
 import { useProviderConfig } from "@/hooks/useProviderConfig"
 import { useProviderModels } from "@/hooks/useProviderModels"
 import { ModelsServiceClient, StateServiceClient } from "@/services/grpc-client"
+import { parseHighlightedText } from "../../utils/safe-highlight"
 import { highlight } from "../history/HistoryView"
 import { ModelInfoView } from "./common/ModelInfoView"
 import FeaturedModelCard from "./FeaturedModelCard"
@@ -537,8 +538,7 @@ const ClineModelPicker: React.FC<ClineModelPickerProps> = ({ isPopup, currentMod
 												justifyContent: "space-between",
 												alignItems: "center",
 											}}>
-											{/* biome-ignore lint/security/noDangerouslySetInnerHtml: highlight() returns sanitized model-id markup for matched search text */}
-											<span dangerouslySetInnerHTML={{ __html: item.html }} />
+											<span>{parseHighlightedText(item.html)}</span>
 											<StarIcon
 												isFavorite={isFavorite}
 												onClick={(e) => {

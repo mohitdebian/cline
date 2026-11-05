@@ -10,6 +10,7 @@ import { useDynamicProviderSelection } from "@/hooks/useDynamicProviderSelection
 import { useProviderModels } from "@/hooks/useProviderModels"
 import { useExtensionState } from "../../context/ExtensionStateContext"
 import { ModelsServiceClient } from "../../services/grpc-client"
+import { parseHighlightedText } from "../../utils/safe-highlight"
 import { highlight } from "../history/HistoryView"
 import { ModelInfoView } from "./common/ModelInfoView"
 import { getModeSpecificFields } from "./utils/providerUtils"
@@ -250,9 +251,6 @@ const GroqModelPicker: React.FC<GroqModelPickerProps> = ({ isPopup, currentMode 
 											? "bg-(--vscode-list-activeSelectionBackground) text-(--vscode-list-activeSelectionForeground)"
 											: ""
 									}`}
-									dangerouslySetInnerHTML={{
-										__html: item.html,
-									}}
 									key={item.id}
 									onClick={() => {
 										handleModelChange(item.id)
@@ -260,8 +258,9 @@ const GroqModelPicker: React.FC<GroqModelPickerProps> = ({ isPopup, currentMode 
 									}}
 									onMouseEnter={() => setSelectedIndex(index)}
 									ref={(el: HTMLDivElement | null) => (itemRefs.current[index] = el)}
-									role="option"
-								/>
+									role="option">
+									{parseHighlightedText(item.html)}
+								</div>
 							))}
 						</div>
 					)}

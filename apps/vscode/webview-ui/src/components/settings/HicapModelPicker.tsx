@@ -6,6 +6,7 @@ import React, { KeyboardEvent, useEffect, useMemo, useRef, useState } from "reac
 import { useMount } from "react-use"
 import { useExtensionState } from "@/context/ExtensionStateContext"
 import { StateServiceClient } from "@/services/grpc-client"
+import { parseHighlightedText } from "../../utils/safe-highlight"
 import { highlight } from "../history/HistoryView"
 import { getModeSpecificFields } from "./utils/providerUtils"
 import { useApiConfigurationHandlers } from "./utils/useApiConfigurationHandlers"
@@ -222,7 +223,7 @@ const HicapModelPicker: React.FC<HicapModelPickerProps> = ({ isPopup, currentMod
 										ref={(el) => (itemRefs.current[index] = el)}
 										role="option">
 										<div className="flex justify-between items-center [&_.model-item-highlight]:bg-[var(--vscode-editor-findMatchHighlightBackground)] [&_.model-item-highlight]:text-inherit">
-											<span dangerouslySetInnerHTML={{ __html: item.html }} />
+											<span>{parseHighlightedText(item.html)}</span>
 											<StarIcon
 												isFavorite={isFavorite}
 												onClick={(e) => {

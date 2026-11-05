@@ -12,6 +12,7 @@ import { useExtensionState } from "@/context/ExtensionStateContext"
 import { useNormalizedApiConfiguration } from "@/hooks/useNormalizedApiConfiguration"
 import { useProviderConfig } from "@/hooks/useProviderConfig"
 import { StateServiceClient } from "@/services/grpc-client"
+import { parseHighlightedText } from "../../utils/safe-highlight"
 import { highlight } from "../history/HistoryView"
 import { ModelInfoView } from "./common/ModelInfoView"
 import ReasoningEffortSelector from "./ReasoningEffortSelector"
@@ -311,7 +312,7 @@ const OpenRouterModelPicker: React.FC<OpenRouterModelPickerProps> = ({ isPopup, 
 										ref={(el) => (itemRefs.current[index] = el)}
 										role="option">
 										<div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-											<span dangerouslySetInnerHTML={{ __html: item.html }} />
+											<span>{parseHighlightedText(item.html)}</span>
 											<StarIcon
 												isFavorite={isFavorite}
 												onClick={(e) => {
