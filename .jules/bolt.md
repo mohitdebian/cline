@@ -1,0 +1,3 @@
+## 2024-05-18 - [Fix React.memo unnecessary re-renders with deeply nested objects in lists]
+**Learning:** `React.memo` by default uses shallow comparison. When large and deeply nested objects like `ClineMessage` are passed down as props in large, dynamic lists like the chat interface, shallow comparison often fails and triggers massive re-renders across the component tree, leading to significant performance degradation.
+**Action:** Use `fast-deep-equal` for the equality function in `React.memo` for components like `ChatRowContent` that receive complex props, particularly when rendered in virtualization lists where re-rendering all rows on any small state change hurts the application speed.
