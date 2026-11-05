@@ -1163,4 +1163,5 @@ export const ChatRowContent = memo(
 				}
 		}
 	},
+	deepEqual,
 )
