@@ -2,6 +2,7 @@ import { VSCodeTextField } from "@vscode/webview-ui-toolkit/react"
 import Fuse from "fuse.js"
 import React, { KeyboardEvent, memo, useEffect, useMemo, useRef, useState } from "react"
 import styled from "styled-components"
+import { parseHighlightedText } from "../../utils/safe-highlight"
 import { highlight } from "../history/HistoryView"
 
 const OLLAMA_MODEL_PICKER_Z_INDEX = 1_000
@@ -183,7 +184,7 @@ const OllamaModelPicker: React.FC<OllamaModelPickerProps> = ({
 								onMouseEnter={() => setSelectedIndex(index)}
 								ref={(el) => (itemRefs.current[index] = el)}
 								role="option">
-								<span dangerouslySetInnerHTML={{ __html: item.html }} />
+								<span>{parseHighlightedText(item.html)}</span>
 							</DropdownItem>
 						))}
 					</DropdownList>

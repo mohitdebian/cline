@@ -1,0 +1,4 @@
+## 2024-05-24 - [CRITICAL] Refactor dangerouslySetInnerHTML across model pickers
+**Vulnerability:** Found multiple usages of `dangerouslySetInnerHTML` in React components (like `GroqModelPicker`, `HuggingFaceModelPicker`, `VercelModelPicker`, etc.) used to render highlighted search items. Also found in `OcaModelPicker` to render banner text.
+**Learning:** Some components used a local `parseHighlightedText` function to safely parse search result highlights, while others relied on `dangerouslySetInnerHTML`. The banner text in `OcaModelPicker` was not sanitized.
+**Prevention:** Always use safe HTML parsing utilities like `parseHighlightedText` to reconstruct elements safely, or use `DOMPurify.sanitize` (which is in `package.json`) when `dangerouslySetInnerHTML` is unavoidable. Extracted `parseHighlightedText` to a shared utility to prevent future occurrences.

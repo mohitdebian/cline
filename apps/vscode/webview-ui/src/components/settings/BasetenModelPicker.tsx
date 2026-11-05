@@ -5,6 +5,7 @@ import React, { KeyboardEvent, useEffect, useMemo, useRef, useState } from "reac
 import { useDynamicProviderSelection } from "@/hooks/useDynamicProviderSelection"
 import { useProviderModels } from "@/hooks/useProviderModels"
 import { useExtensionState } from "../../context/ExtensionStateContext"
+import { parseHighlightedText } from "../../utils/safe-highlight"
 import { highlight } from "../history/HistoryView"
 import { ModelInfoView } from "./common/ModelInfoView"
 import { getModeSpecificFields } from "./utils/providerUtils"
@@ -115,28 +116,6 @@ const BasetenModelPicker: React.FC<BasetenModelPickerProps> = ({ isPopup, curren
 			: searchableItems
 		return results
 	}, [searchableItems, debouncedSearchTerm, fuse])
-
-	// Safe HTML parser for highlighted search results
-	const parseHighlightedText = React.useCallback((htmlString: string) => {
-		// Split by highlight spans and reconstruct as React elements
-		const parts = htmlString.split(/(<span class="model-item-highlight">.*?<\/span>)/g)
-
-		return parts
-			.map((part) => {
-				if (part.startsWith('<span class="model-item-highlight">')) {
-					// Extract text content from span
-					const text = part.replace(/<span class="model-item-highlight">(.*?)<\/span>/, "$1")
-					return (
-						<span className="model-item-highlight" key={`highlight-${text}`}>
-							{text}
-						</span>
-					)
-				}
-				// Return plain text without wrapping in span
-				return part || null
-			})
-			.filter((part) => part !== null && part !== "")
-	}, [])
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
 		if (!isDropdownVisible) {

@@ -9,6 +9,7 @@ import { useMount } from "react-use"
 import styled from "styled-components"
 import { useExtensionState } from "@/context/ExtensionStateContext"
 import { useProviderConfig } from "@/hooks/useProviderConfig"
+import { parseHighlightedText } from "../../utils/safe-highlight"
 import { highlight } from "../history/HistoryView"
 import { ModelInfoView } from "./common/ModelInfoView"
 import ReasoningEffortSelector from "./ReasoningEffortSelector"
@@ -248,7 +249,7 @@ const VercelModelPicker: React.FC<VercelModelPickerProps> = ({ isPopup, currentM
 										onMouseEnter={() => setSelectedIndex(index)}
 										ref={(el) => (itemRefs.current[index] = el)}
 										role="option">
-										<span dangerouslySetInnerHTML={{ __html: item.html }} />
+										<span>{parseHighlightedText(item.html)}</span>
 									</DropdownItem>
 								))
 							) : (

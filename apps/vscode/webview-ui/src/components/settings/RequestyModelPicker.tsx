@@ -11,6 +11,7 @@ import { useDynamicProviderSelection } from "@/hooks/useDynamicProviderSelection
 import { useProviderConfig } from "@/hooks/useProviderConfig"
 import { useExtensionState } from "../../context/ExtensionStateContext"
 import { ModelsServiceClient } from "../../services/grpc-client"
+import { parseHighlightedText } from "../../utils/safe-highlight"
 import { highlight } from "../history/HistoryView"
 import { ModelInfoView } from "./common/ModelInfoView"
 import ReasoningEffortSelector from "./ReasoningEffortSelector"
@@ -236,9 +237,6 @@ const RequestyModelPicker: React.FC<RequestyModelPickerProps> = ({ isPopup, base
 						<DropdownList ref={dropdownListRef} role="listbox">
 							{modelSearchResults.map((item, index) => (
 								<DropdownItem
-									dangerouslySetInnerHTML={{
-										__html: item.html,
-									}}
 									isSelected={index === selectedIndex}
 									key={item.id}
 									onClick={() => {
@@ -247,8 +245,9 @@ const RequestyModelPicker: React.FC<RequestyModelPickerProps> = ({ isPopup, base
 									}}
 									onMouseEnter={() => setSelectedIndex(index)}
 									ref={(el) => (itemRefs.current[index] = el)}
-									role="option"
-								/>
+									role="option">
+									{parseHighlightedText(item.html)}
+								</DropdownItem>
 							))}
 						</DropdownList>
 					)}
